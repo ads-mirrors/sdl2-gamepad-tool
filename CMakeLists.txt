@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.16)
-project(gamepad-tool VERSION 1.4 LANGUAGES CXX)
+project(gamepad-tool VERSION 1.4.2 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -24,12 +24,17 @@ else()
     message(STATUS "Using Qt ${Qt5_VERSION}")
 endif()
 
-# SDL2: prefer system install, fall back to building from source
-find_package(SDL2 QUIET)
-if(NOT SDL2_FOUND)
-    find_package(PkgConfig QUIET)
-    if(PkgConfig_FOUND)
-        pkg_check_modules(SDL2 QUIET IMPORTED_TARGET sdl2)
+# SDL2: prefer system install, fall back to building from source.
+# When building a universal binary, skip system SDL2 (likely single-arch from
+# Homebrew) and build from source so both architectures are covered.
+list(LENGTH CMAKE_OSX_ARCHITECTURES _osx_arch_count)
+if(_osx_arch_count LESS 2)
+    find_package(SDL2 QUIET)
+    if(NOT SDL2_FOUND)
+        find_package(PkgConfig QUIET)
+        if(PkgConfig_FOUND)
+            pkg_check_modules(SDL2 QUIET IMPORTED_TARGET sdl2)
+        endif()
     endif()
 endif()
 if(NOT SDL2_FOUND AND NOT TARGET PkgConfig::SDL2)

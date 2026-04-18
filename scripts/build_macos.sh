@@ -12,10 +12,21 @@ if [ -f "$PROJECT_DIR/.env" ]; then
     set +a
 fi
 
-# Find Qt6 prefix (Homebrew)
-QT_PREFIX="$(brew --prefix qt@6 2>/dev/null || true)"
+# Find Qt6 prefix
+# 1. Explicit QT_PREFIX env var
+# 2. Qt online installer (~/Qt/<version>/macos)
+# 3. Homebrew
 if [ -z "$QT_PREFIX" ]; then
-    echo "Error: Qt6 not found. Install with: brew install qt@6"
+    # Look for Qt online installer (~/Qt/<version>/macos)
+    for dir in "$HOME"/Qt/*/macos; do
+        [ -d "$dir" ] && QT_PREFIX="$dir"
+    done
+fi
+if [ -z "$QT_PREFIX" ]; then
+    QT_PREFIX="$(brew --prefix qt@6 2>/dev/null || true)"
+fi
+if [ -z "$QT_PREFIX" ]; then
+    echo "Error: Qt6 not found. Install from https://www.qt.io/download or: brew install qt@6"
     exit 1
 fi
 
