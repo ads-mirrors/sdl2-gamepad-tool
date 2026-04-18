@@ -307,6 +307,17 @@ void MainWindow::on_gamepadComboBox_currentIndexChanged(int index) {
         ui->copyButton->setEnabled(isGamepad);
         ui->setEnvVarButton->setEnabled(isGamepad);
         updateDeleteLocalMappingState();
+
+        SDL_JoystickGUID guid = SDL_JoystickGetGUID(m_currentJoystick);
+        char guidStr[64];
+        SDL_JoystickGetGUIDString(guid, guidStr, sizeof(guidStr));
+        QString guidQStr(guidStr);
+        if (guidQStr.endsWith("6800")) {
+            Logger::instance().warning(
+                QString("Device \"%1\" appears to be handled by an SDL built-in driver (GUID ends with 6800). "
+                        "Mappings for this device can be modified locally but should NOT be submitted to community databases.")
+                    .arg(SDL_JoystickName(m_currentJoystick)));
+        }
     }
 }
 
@@ -321,6 +332,12 @@ void MainWindow::copyGuid() {
         return;
     }
     SDL_JoystickGUID guid = SDL_JoystickGetGUID(m_currentJoystick);
+    Uint16 crc;
+    SDL_GetJoystickGUIDInfo(guid, nullptr, nullptr, nullptr, &crc);
+    if (crc) {
+        guid.data[2] = 0;
+        guid.data[3] = 0;
+    }
     char guidStr[64];
     SDL_JoystickGetGUIDString(guid, guidStr, sizeof(guidStr));
 

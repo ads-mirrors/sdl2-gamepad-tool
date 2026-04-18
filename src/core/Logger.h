@@ -12,6 +12,7 @@ public:
     static Logger& instance();
 
     void info(const QString& message);
+    void warning(const QString& message);
     void debug(const QString& message);
     void error(const QString& message);
 

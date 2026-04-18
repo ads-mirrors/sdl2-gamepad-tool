@@ -19,6 +19,13 @@ void Logger::info(const QString& message)
     emit messageLogged(message);
 }
 
+void Logger::warning(const QString& message)
+{
+    fprintf(stdout, "[WARNING] %s\n", message.toUtf8().constData());
+    fflush(stdout);
+    emit messageLogged(message);
+}
+
 void Logger::debug(const QString& message)
 {
     fprintf(stdout, "[DEBUG] %s\n", message.toUtf8().constData());
