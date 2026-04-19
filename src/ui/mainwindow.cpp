@@ -314,7 +314,12 @@ void MainWindow::on_gamepadComboBox_currentIndexChanged(int index) {
         QString guidQStr(guidStr);
         if (guidQStr.endsWith("6800")) {
             Logger::instance().warning(
-                QString("Device \"%1\" appears to be handled by an SDL built-in driver (GUID ends with 6800). "
+                QString("Device \"%1\" appears to be handled by an SDL built-in HID driver (GUID ends with 6800). "
+                        "Mappings for this device can be modified locally but should NOT be submitted to community databases.")
+                    .arg(SDL_JoystickName(m_currentJoystick)));
+        } else if (guidQStr.mid(28, 2) == "78") {
+            Logger::instance().warning(
+                QString("Device \"%1\" appears to be handled by an XInput driver (GUID ends with 78XX). "
                         "Mappings for this device can be modified locally but should NOT be submitted to community databases.")
                     .arg(SDL_JoystickName(m_currentJoystick)));
         }
